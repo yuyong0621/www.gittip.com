@@ -14,6 +14,17 @@ from virtualenv import create_environment, Logger
 WINDOWS = platform.system() == "Windows"
 
 
+def bail(msg):
+    if not WINDOWS:
+        # show errors with ANSI color red
+        msg = "\x1b[31m" + msg + "\x1b[0m"
+    print(msg)
+    sys.exit(1)
+
+
+# Send output to both logfile and console.
+# ========================================
+
 class Writer:
     fp = open('bootstrap.log', 'w+')
     def write(self, s):
@@ -24,13 +35,6 @@ class Writer:
         self.fp.flush()
 
 sys.stdout = Writer()
-
-
-def bail(msg):
-    if not WINDOWS:
-        msg = "\x1b[31m" + msg + "\x1b[0m"
-    print(msg)
-    sys.exit(1)
 
 
 # Check Python version.
@@ -62,6 +66,11 @@ expects to be able to create that directory itself. What have you done?!""")
 
 # Check for activated virtualenv.
 # ===============================
+# Gittip owns its virtualenv, not the other way around. The reason is to make
+# things user-friendly for developers coming from other languages and maybe
+# even designers. An experience Python dev will still be able to install Gittip
+# into their own virtualenv, of course, if that's what they want. This check is
+# intended as an aide for those not looking to void the warranty.
 
 if 'VIRTUAL_ENV' in os.environ:
     bail("""\
