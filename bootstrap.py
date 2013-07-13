@@ -4,26 +4,45 @@ from __future__ import unicode_literals, print_function
 import commands
 import os
 import platform
+import subprocess
 import sys
-from virtualenv import create_environment
 
-colors = { "red": "31"
-         , "green": "32"
-         , "yellow": "33"
-         , "gray": "37"
-          }
+import virtualenv
+from virtualenv import create_environment, Logger
+
+
+WINDOWS = platform.system() == "Windows"
+
+
+class Writer:
+    fp = open('bootstrap.log', 'w+')
+    def write(self, s):
+        print(s, end='', file=sys.__stdout__)
+        print(s, end='', file=self.fp)
+    def flush(self):
+        sys.__stdout__.flush()
+        self.fp.flush()
+
+sys.stdout = Writer()
+
 
 def bail(msg):
-    if platform.system() not in ('Windows'):
+    if not WINDOWS:
         msg = "\x1b[31m" + msg + "\x1b[0m"
-    print(msg, file=sys.stderr)
+    print(msg)
     sys.exit(1)
 
 
 # Check Python version.
 # =====================
 
-if sys.version_info < (2, 7):
+print("="*78)
+print( "Bootstrapping Gittip using Python %s on %s."
+     % (platform.python_version(), platform.platform())
+      )
+print("="*78)
+
+if sys.version_info[:2] != (2, 7):
     msg = "Gittip requires Python 2.7.x. You're using %s."
     bail(msg % platform.python_version())
 
@@ -53,6 +72,11 @@ if 'WORKING_ENV' in os.environ:
 You're in a workingenv (really?!). Please deactivate it and run again, because
 bootstrap.py expects to create its own virtualenv.""")
 
+
+# Create the virtualenv.
+# ======================
+
+virtualenv.logger = Logger([(Logger.level_for_integer(2 - 1), sys.stdout)])
 create_environment( "env"
                   , site_packages=False
                   , clear=False
@@ -61,9 +85,39 @@ create_environment( "env"
                   , prompt="[gittip] "
                   , search_dirs=['vendor']
                   , never_download=True
-                  , no_setuptools=True
+                  , no_setuptools=False
                   , no_pip=False
                    )
+
+
+# Populate the virtualenv.
+# ========================
+# Modify requirements.txt (placing tarballs in vendor/) to change what gets
+# installed.
+
+pip = os.path.join("env", "Scripts" if WINDOWS else "bin", "pip")
+to_install = ( ["-r", "requirements.txt"]
+             , ["./vendor/nose-1.1.2.tar.gz"]
+             , ["-e", "./"]
+              )
+for thing in to_install:
+    retcode = subprocess.call([pip, "install"] + thing)
+    if retcode > 0:
+        bail("""\
+Failed to bootstrap Gittip. :(
+
+Need help?
+
+    1. See if anyone is around on IRC: http://chat.gittip.com/
+
+    2. Paste your bootstrap.log at https://gist.github.com/ and link it in a
+       new GitHub issue: https://github.com/gittip/www.gittip.com/issues/new.
+""")
+
+
+# Output a welcome message.
+# =========================
+# Tailor the message for Windows or Unix.
 
 WELCOME = """\
 ==============================================================================
@@ -79,13 +133,10 @@ WELCOME = """\
 ------------------------------------------------------------------------------
 
 Greetings, program! %(green)sSuccess!%(default_color)s You now have a so-called "Python virtual
-environment" (a.k.a. a "virtualenv") at ./env/. Here's some real live %(ls)s
-output:
+environment" (a.k.a. a "virtualenv") at ./env/, into which is installed the
+gittip Python library and all its dependencies.
 
-    %(ls_output)s
-
-
-This is your local development sandbox for Gittip. Next steps:
+This virtualenv is your local development sandbox for Gittip. Next steps:
 
     1. %(green)s"Activate" your new virtualenv by running `%(activate)s`.%(default_color)s If
        your prompt sprouts a "[gittip] ", it worked. Activating a Python
@@ -102,12 +153,16 @@ This is your local development sandbox for Gittip. Next steps:
        [gittip] %(prompt)s gittip test
        [gittip] %(prompt)s gittip run
 
+    3. %(green)sChange some source code!%(default_color)s
 
-From here on out, everything happens with the gittip cli. Have fun! :)
+       - gittip/ contains our Python library
+       - scss/ contains SCSS files
+       - tests/ contains tests
+       - www/ contains HTTP endpoints as so-called "simplates"
 
 =============================================================================="""
 
-if platform.system() == 'Windows':
+if WINDOWS:
     listing = commands.getoutput("dir").splitlines()
     ls_output = "".join([line for line in listing if "env/" in line])
     if not ls_output:
