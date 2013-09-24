@@ -77,6 +77,20 @@ def check_role(request):
 
 
 def outbound(response):
+
+    # Bail early if we can.
+    # =====================
+    # If there's no session cookie in the request, don't set one in the
+    # response. Maybe they're an anonymous web surfer, or maybe they're using
+    # an API key in HTTP Basic auth.
+
+    if 'session' not in response.request.headers.cookie:
+        return
+
+
+    # Get a user object.
+    # ==================
+
     if 'user' in response.request.context:
         user = response.request.context['user']
         if not isinstance(user, User):
@@ -85,16 +99,16 @@ def outbound(response):
     else:
         user = User()
 
-    if user.ANON: # user is anonymous
-        if 'session' not in response.request.headers.cookie:
-            # no cookie in the request, don't set one on response
-            return
-        else:
-            # expired cookie in the request, instruct browser to delete it
-            response.headers.cookie['session'] = ''
-            expires = 0
-    else: # user is authenticated
-        response.headers['Expires'] = BEGINNING_OF_EPOCH # don't cache
+
+    # Set a session cookie.
+    # =====================
+
+    if user.ANON:
+        # expired cookie in the request, instruct browser to delete it
+        response.headers.cookie['session'] = ''
+        expires = 0
+    else:
+        response.headers['Expires'] = BEGINNING_OF_EPOCH  # don't cache
         response.headers.cookie['session'] = user.participant.session_token
         expires = time.time() + TIMEOUT
         user.keep_signed_in_until(expires)
@@ -107,4 +121,12 @@ def outbound(response):
     cookie['expires'] = rfc822.formatdate(expires)
     cookie['httponly'] = "Yes, please."
     if gittip.canonical_scheme == 'https':
+
+        # Don't leak from https://www.gittip.com/ to http://www.gittip.com/. If
+        # we do, then we end up setting an empty session cookie on the redirect
+        # back to https://www.gittip.com/. And it's just not something we want
+        # to do anyway.
+
+        # https://github.com/gittip/www.gittip.com/issues/940
+
         cookie['secure'] = "Yes, please."
