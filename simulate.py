@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-import profile
+import cProfile
 import sys
 
 from gittip.testing.client import TestClient
@@ -10,7 +10,7 @@ from gittip.testing.client import TestClient
 def main(path, run_through_profiler):
     client = TestClient()
     if run_through_profiler:
-        profiler = profile.Profile()
+        profiler = cProfile.Profile()
         profiler.runcall(client.get, path)
         profiler.print_stats(sort=2)
     else:
