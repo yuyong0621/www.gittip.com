@@ -15,6 +15,8 @@ $ gittip.py
 This will also initialize a local environment on the first run.
 """
 
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 import hashlib
 import os
 import sys
@@ -46,9 +48,9 @@ def main():
     try:
         bootstrap_environment()
     except CalledProcessError as ex:
-        print ex.output
+        print(ex.output)
     except EnvironmentError as ex:
-        print 'Error:', ex
+        print('Error:', ex)
         return 1
 
     run_server()
@@ -77,7 +79,7 @@ def init_config():
     if os.path.exists(config_path):
         return
 
-    print 'Creating a %s file...' % config_path
+    print('Creating a %s file...' % config_path)
     shutil.copyfile(default_config_path, config_path)
 
 
@@ -85,7 +87,7 @@ def init_virtualenv():
     if os.path.exists(env_path):
         return
 
-    print 'Initializing virtualenv at %s...' % env_path
+    print('Initializing virtualenv at %s...' % env_path)
 
     shell('python', virtualenv_path,
           '--unzip-setuptools',
@@ -114,7 +116,7 @@ def install_requirements():
     if old_hash == new_hash:
         return
 
-    print 'Installing requirements...'
+    print('Installing requirements...')
 
     shell(pip_path, 'install', '-r', 'requirements.txt')
     shell(pip_path, 'install', '-r', 'requirements_tests.txt')
