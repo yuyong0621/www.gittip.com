@@ -15,6 +15,7 @@ $ gittip.py
 This will also initialize a local environment on the first run.
 """
 
+import hashlib
 import os
 import sys
 import shutil
@@ -96,17 +97,31 @@ def init_virtualenv():
 
 
 def install_requirements():
-    # TODO: Detect when requirements.txt changes instead of checking for a file
-    if os.path.exists(requirements_installed_path):
+
+    with open('requirements.txt', 'rb') as f:
+        req = f.read()
+    with open('requirements_tests.txt', 'rb') as f:
+        req += f.read()
+
+    try:
+        with open(requirements_installed_path, 'rb') as f:
+            old_hash = f.read()
+    except IOError:
+        old_hash = ''
+
+    new_hash = hashlib.sha1(req).hexdigest()
+
+    if old_hash == new_hash:
         return
 
     print 'Installing requirements...'
 
     shell(pip_path, 'install', '-r', 'requirements.txt')
-    shell(pip_path, 'install', os.path.join(vendor_path, 'nose-1.1.2.tar.gz'))
+    shell(pip_path, 'install', '-r', 'requirements_tests.txt')
     shell(pip_path, 'install', '-e', '.')
 
-    open(requirements_installed_path, 'w').close()
+    with open(requirements_installed_path, 'w') as f:
+        f.write(new_hash)
 
 
 def run_server(host=None, port=None):
@@ -117,12 +132,15 @@ def run_server(host=None, port=None):
 
     # TODO: Wait for Aspen to quit before exiting
 
-    shell(swaddle_path, config_path, aspen_path,
-          '--www_root=www/',
-          '--project_root=.',
-          '--show_tracebacks=yes',
-          '--changes_reload=yes',
-          '--network_address=%s:%s' % (host, port))
+    try:
+        shell(swaddle_path, config_path, aspen_path,
+            '--www_root=www/',
+            '--project_root=.',
+            '--show_tracebacks=yes',
+            '--changes_reload=yes',
+            '--network_address=%s:%s' % (host, port))
+    except KeyboardInterrupt:
+        pass
 
 
 def shell(*args, **kwargs):
