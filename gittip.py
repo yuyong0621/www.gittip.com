@@ -28,13 +28,11 @@ is_win = sys.platform.startswith('win')
 bin_dir = 'Scripts' if is_win else 'bin'
 ext = '.exe' if is_win else ''
 
-default_port = 8537
 vendor_path = 'vendor'
 env_path = 'env'
 requirements_installed_path = os.path.join(env_path, '.requirements_installed')
 bin_path = os.path.join(env_path, bin_dir)
 default_config_path = 'default_local.env'
-config_path = 'local.env'
 virtualenv_path = os.path.join(vendor_path, 'virtualenv-1.9.1.py')
 pip_path = os.path.join(bin_path, 'pip' + ext)
 swaddle_path = os.path.join(bin_path, 'swaddle' + ext)
@@ -42,28 +40,35 @@ aspen_path = os.path.join(bin_path, 'aspen' + ext)
 
 
 def main():
-    # TODO: Handle command-line arguments to override default config values
-    #  e.g. the address and port to serve on, whether to run tests, etc
+    from argparse import ArgumentParser
+    parser = ArgumentParser()
+    parser.add_argument('--port', '-p', type=int, default=8537, help='port to listen to')
+    parser.add_argument('--config', '-c', default='local.env', help='configuration filepath')
+    parser.add_argument('--address', '-a', default='localhost', help='address to listen to')
+    parser.add_argument('--version', action='version', version='ahoj')
+    parser.add_argument('--clean', action='store_true', help='clean env')
+    #parser.add_argument('command', nargs='?', default='run', help='what to do')
+    args = parser.parse_args()
 
     try:
-        bootstrap_environment()
+        bootstrap_environment(args)
     except CalledProcessError as ex:
         print(ex.output)
     except EnvironmentError as ex:
         print('Error:', ex)
         return 1
 
-    run_server()
+    run_server(args)
 
 
-def bootstrap_environment():
-    ensure_dependencies()
-    init_config()
-    init_virtualenv()
-    install_requirements()
+def bootstrap_environment(args):
+    ensure_dependencies(args)
+    init_config(args)
+    init_virtualenv(args)
+    install_requirements(args)
 
 
-def ensure_dependencies():
+def ensure_dependencies(args):
     if not shell('python', '--version', capture=True).startswith('Python 2.7'):
         raise EnvironmentError('Python 2.7 is required.')
 
@@ -75,15 +80,15 @@ def ensure_dependencies():
         raise EnvironmentError('Postgresql is required. (Make sure pg_config is on your PATH.)')
 
 
-def init_config():
-    if os.path.exists(config_path):
+def init_config(args):
+    if os.path.exists(args.config):
         return
 
-    print('Creating a %s file...' % config_path)
-    shutil.copyfile(default_config_path, config_path)
+    print('Creating a %s file...' % args.config)
+    shutil.copyfile(default_config_path, args.config)
 
 
-def init_virtualenv():
+def init_virtualenv(args):
     if os.path.exists(env_path):
         return
 
@@ -98,7 +103,7 @@ def init_virtualenv():
           env_path)
 
 
-def install_requirements():
+def install_requirements(args):
 
     with open('requirements.txt', 'rb') as f:
         req = f.read()
@@ -113,7 +118,7 @@ def install_requirements():
 
     new_hash = hashlib.sha1(req).hexdigest()
 
-    if old_hash == new_hash:
+    if not args.clean and old_hash == new_hash:
         return
 
     print('Installing requirements...')
@@ -126,21 +131,15 @@ def install_requirements():
         f.write(new_hash)
 
 
-def run_server(host=None, port=None):
-    if host is None:
-        host = 'localhost'
-    if port is None:
-        port = default_port
-
-    # TODO: Wait for Aspen to quit before exiting
+def run_server(args):
 
     try:
-        shell(swaddle_path, config_path, aspen_path,
+        shell(swaddle_path, args.config, aspen_path,
             '--www_root=www/',
             '--project_root=.',
             '--show_tracebacks=yes',
             '--changes_reload=yes',
-            '--network_address=%s:%s' % (host, port))
+            '--network_address=%s:%s' % (args.address, args.port))
     except KeyboardInterrupt:
         pass
 
