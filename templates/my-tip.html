@@ -1,20 +1,40 @@
 <form class="my-tip{{ " anon" if user.ANON else "" }}">
     <div class="tip-controls">
-        <div class="tip-amount">
-            $ <input type="number" class="my-tip" min="0" max="100" step="0.01" value="{{ my_tip }}" data-tippee="{{ tippee }}"> / week
-        </div>
-
         <ul class="tip-suggestions">
-            <li><a href="#">$100</a></li>
-            <li><a href="#">$25</a></li>
-            <li><a href="#">$10</a></li>
-            <li><a href="#">$2</a></li>
-            <li><a href="#" class="cents">25¢</a></li>
+            <li><a href="#" class="cents">$0.25</a></li>
+            <li><a href="#">$2.00</a></li>
+            <li><a href="#">$10.00</a></li>
+            <li><a href="#">$25.00</a></li>
+            <li><a href="#">$100.00</a></li>
         </ul>
+        <div class="tip-amount">
+            <input type="number" class="my-tip" min="0" max="100" step="0.01" value="{{ my_tip }}" data-tippee="{{ tippee }}">
+            <div class="dollar">$</div>
+        </div>
+        <div class="notice">
+            Gittip will charge you every Thursday to fund the gift.
+        </div>
     </div>
 
-    <div class="tip-actions">
-        <button class="confirm-tip" disabled>Confirm</button><br>
-        <a href="#" class="cancel-tip">Cancel</a>
-    </div>
+    <button class="btn primary confirm-tip" disabled>Confirm</button>
 </form>
+
+<div id="payment-method-dialog" class="hidden">
+    <div class="overlay"></div>
+    <form id="payment-method" class="modal">
+        <div class="close"></div>
+        <div class="content">
+            <h2>Set up payment method</h2>
+            <div class="message"><b>Your weekly gift amount has been updated.</b></div>
+            <div class="message">The payment method you select will be applied to all gifts for all users.</div>
+
+            <div class="payment-option selected"><input type="radio" name="payment-option" id="credit" value="credit" checked><label for="credit">Add your credit/debit card</label></div>
+            <div class="payment-option"><input type="radio" name="payment-option" id="coinbase" value="coinbase"><label for="coinbase">Connect your Coinbase account</label></div>
+            <div class="payments-by">Payments by</div><div class="balanced-logo"></div>
+        </div>
+        <div class="action-bar">
+            <a class="btn secondary">Skip</a>
+            <button class="btn primary">Continue</button>
+        </div>
+    </form>
+</div>

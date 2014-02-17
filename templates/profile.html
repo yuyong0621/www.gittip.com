@@ -13,9 +13,8 @@
 
 {% block nav %}
 {% set current_page = path.raw.split('/')[2] %}
+<div class="profile-nav">
 {% if user.participant == participant or user.ADMIN %}
-<div class="nav level-2">
-    <h2>Navigation</h2>
     {% set pages = [('/', 'Profile'), ('/giving/', 'Giving'), ('/history/', 'History'), ('/widgets/', 'Widgets')] %}
     {% for slug, name in pages %}
     <a href="/{{ participant.username }}{{ slug }}"><button{% if slug.strip('/') == current_page %} class="selected"{% endif %}>{{ name }}</button></a>
@@ -23,12 +22,8 @@
     {% if participant.show_as_team(user) %}
     <a href="/{{ participant.username }}/members/"><button{% if 'members' == current_page %} class="selected"{% endif %}>Members</button></a>
     {% endif %}
-</div>
 {% elif participant.show_as_team(user) %}
-<div class="nav level-2">
-    <h2>Navigation</h2>
     <a href="/{{ participant.username }}/"><button{% if '' == current_page %} class="selected"{% endif %}>Profile</button></a>
     <a href="/{{ participant.username }}/members/"><button{% if 'members' == current_page %} class="selected"{% endif %}>Members</button></a>
-</div>
 {% endif %}
-{% endblock %}
+</div>{% endblock %}
