@@ -23,12 +23,7 @@
         {% include "templates/sign-in-using-to-give.html" %}
     {% else %}
         {% include "templates/my-tip.html" %}
-        {% if user.participant.last_bill_result == None %}
-            <div id="payment-prompt" class="help{% if my_tip > 0 %} needed{% endif %}">
-            Back your gift with a <a href="/credit-card.html"
-                class="highlight">credit card</a> to make sure it goes
-            through!</div>
-        {% elif user.participant.last_bill_result %}
+        {% if user.participant.last_bill_result %}
             <div id="payment-prompt" class="help really-needed">Fix your <a
                 href="/credit-card.html" class="highlight">credit
                 card</a> to make sure your gifts go through!</div>

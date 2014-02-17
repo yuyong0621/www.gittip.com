@@ -70,6 +70,7 @@ else:
 <script>
     marketplace_uri = "{{ balanced.Marketplace.my_marketplace.uri }}";
     participant_username = "{{ user.participant.username }}";
+    last_bill_result = "{{ user.participant.last_bill_result }}";
 </script>
 {% if show_charts %}
 <script>
