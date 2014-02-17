@@ -1,6 +1,7 @@
 """Show information about a single participant. It might be you!
 """
 import locale
+import balanced
 
 from aspen import json, Response
 from aspen.utils import to_age
@@ -66,6 +67,10 @@ else:
 {% endblock %}
 
 {% block scripts %}
+<script>
+    marketplace_uri = "{{ balanced.Marketplace.my_marketplace.uri }}";
+    participant_username = "{{ user.participant.username }}";
+</script>
 {% if show_charts %}
 <script>
 $(document).ready(function() {

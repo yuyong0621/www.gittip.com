@@ -55,7 +55,9 @@ Gittip.tips.init = function() {
         var $this  = $(this),
             $myTip = $this.parents('form').find('.my-tip');
 
-        $myTip.val($this.text().match(/\d+/)[0] / ($this.hasClass('cents') ? 100 : 1)).change();
+        var amount = $this.text().match(/\d+.\d+/);
+        $myTip.val(amount).change();
+
     });
 
     $('form.my-tip').on('reset', function() {
@@ -65,6 +67,7 @@ Gittip.tips.init = function() {
 
     $('form.my-tip').submit(function(event) {
         event.preventDefault();
+
         var $this     = $(this),
             $myTip    = $this.find('.my-tip'),
             amount    = parseFloat($myTip.val(), 10),
@@ -98,15 +101,43 @@ Gittip.tips.init = function() {
 
                 // update quick stats
                 $('.quick-stats a').text('$' + data.total_giving + '/wk');
-
-                alert("Tip changed to $" + amount + "!");
             })
             .fail(function() {
                 alert('Sorry, something went wrong while changing your tip. :(');
                 console.log.apply(console, arguments);
             })
         }
+
+        // if payment method is not set up
+        $('#payment-method-dialog').show();
+        $("#payment-method").css({
+            "marginLeft": -($("#payment-method").width()/2),
+            "marginTop": -($("#payment-method").height()/2)
+        });
+    });
+    
+    $paymentOption = $('#payment-method input:radio[name=payment-option]');
+    $paymentOption.click(function(e) {
+        $paymentOption.each(function (index, item){
+            if($(item).is(":checked")){
+                $(item).parent().addClass('selected');
+            } else {
+                $(item).parent().removeClass('selected');
+            }        
+        });
     });
 
+    $('#payment-method .secondary, #payment-method-dialog .overlay').click(function(e) {
+        $('#payment-method-dialog').hide();
+    });
+
+    $('#payment-method .primary').click(function(e) {
+        e.preventDefault();
+
+        if($('input:radio[name=payment-option]:checked').val() == 'coinbase') {
+            Gittip.payments.cb.init(marketplace_uri, participant_username);
+        }
+
+    });
 };
 

@@ -379,3 +379,22 @@ Gittip.payments.cc.handleResponse = function(response) {
                        , detailedFeedback
                         );
 };
+
+// Coinbase
+// ============
+
+Gittip.payments.cb = {};
+
+Gittip.payments.cb.init = function(balanced_uri, participantId) {
+    Gittip.participantId = participantId;
+
+    // Lazily depend on Balanced.
+    var balanced_js = "https://js.balancedpayments.com/v1/balanced.js";
+    jQuery.getScript(balanced_js, function() {
+        balanced.init(balanced_uri);
+        balanced.network.create('coinbase', function(response) {
+            console.log(response);
+            Gittip.havePayments = true;
+        });
+    });
+};
