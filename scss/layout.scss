@@ -239,7 +239,7 @@
         .pad-sign {
             padding-left: 36px;
         }
-        .my-total-giving {
+        .my-total-giving, .total-giving {
             padding-left: 36px;
         }
 
@@ -260,7 +260,9 @@
         }
         */
     }
-
+    .profile-nav {
+        padding-bottom: 10px;
+    }
     .weekly-gift {
         padding: 10px;
         width: 100%;
@@ -274,7 +276,7 @@
             line-height: 30px;
         }
         .label {
-            letter-spacing: 0.1em;
+            font-weight: 500;
             text-transform: uppercase;
         }
         .amount {
@@ -321,6 +323,21 @@
                 display: block;
                 color: white;
             }
+        }
+    }
+
+    .promo-bar {
+        background-color: $white;
+        padding: 10px 15px;
+        font-size: 13px;
+        font-weight: bold;
+        color: $gray;
+
+        img {
+            width: 18px;
+            height: 18px;
+            vertical-align: top;
+            margin-right: 2px;
         }
     }
 

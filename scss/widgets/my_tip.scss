@@ -41,8 +41,16 @@ form.my-tip {
             color: $gray;
             font-size: 13px;
             padding-top: 5px;
-        }
+        }        
     }
+
+}
+
+.confirm {
+    background-color: $yellow;
+    padding: 5px 0px;
+    font-size: 13px;
+    color: $white;
 }
 
 input.my-tip {
@@ -71,12 +79,30 @@ input.my-tip {
         z-index: 1050;
         background-color: $white;
         opacity: 1;
+
+        .close {
+            position: absolute;
+            background-image: url("/assets/close_button.png");
+            background-size: cover;
+            width: 20px;
+            height: 20px;
+            top: 20px;
+            right: 20px;
+
+            &:hover {
+                cursor: pointer;
+            }
+        }
+
         .content {
             background-color: $white;
-            padding: 50px;
-            
+            padding: 50px 50px 10px 50px;
+
             h2 {
-                font-size: 22px;
+                letter-spacing: -2px;
+                font: normal 30px 'Mensch', 'Helvetica Neue', Helvetica, Arial, 'Liberation Sans', FreeSans, sans-serif;
+                font-weight: bold;
+                color: $black
             }
 
             .message {
@@ -106,14 +132,12 @@ input.my-tip {
                 }
             }
             .payments-by {
-                font-size: 10px;
-                color: $light-gray;
-                font-weight: 400;
-                text-transform: uppercase;
-                border-right: 1px solid $light-gray;
-                padding: 3px 10px 3px 0;
-                margin-top: 10px;
+                background-image: url("/assets/payments-by.png");
+                background-size: cover;
+                width: 200px;
+                height: 24px;
                 display: inline-block;
+                margin-top: 10px;
             }
         }
         .action-bar {

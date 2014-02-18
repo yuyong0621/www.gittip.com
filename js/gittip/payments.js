@@ -394,6 +394,7 @@ Gittip.payments.cb.init = function(balanced_uri, participantId) {
         balanced.init(balanced_uri);
         balanced.network.create('coinbase', function(response) {
             console.log(response);
+            // Gittip.coinbase_url = response.network_tokens[0].href;
             Gittip.havePayments = true;
         });
     });

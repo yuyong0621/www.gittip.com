@@ -70,7 +70,12 @@ else:
 <script>
     marketplace_uri = "{{ balanced.Marketplace.my_marketplace.uri }}";
     participant_username = "{{ user.participant.username }}";
-    last_bill_result = "{{ user.participant.last_bill_result }}";
+    has_payment_method = "{{ user.participant.last_bill_result }}";
+    if (has_payment_method == "") {
+        has_coinbase = false;
+    } else {
+        has_coinbase = true;
+    }
 </script>
 {% if show_charts %}
 <script>

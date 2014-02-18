@@ -33,6 +33,12 @@ button, .btn {
         background-color: $light-gray;
     }
 
+    &.small {
+        padding: 5px 8px;
+        margin: 0 0 0 1px;
+        background-color: $gray;
+    }
+
     &:disabled {
         opacity: .5;
 

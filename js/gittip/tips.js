@@ -107,19 +107,25 @@ Gittip.tips.init = function() {
                 console.log.apply(console, arguments);
             })
         }
-
-        if (last_bill_result != "None") {
+        // show payment method dialog
+        if (has_payment_method) {
             $('#payment-method-dialog').show();
             $("#payment-method").css({
                 "marginLeft": -($("#payment-method").width()/2),
                 "marginTop": -($("#payment-method").height()/2)
             });
         }
-        
+        // show confirmation message once
+        if ($('.box').has(".confirm").length == 0){
+            var notice = $('<div class="confirm">Your weekly gift has been updated.</div>');
+            $('.nav').after(notice);
+        }
+
+        // update amount
         $('.weekly-gift .amount').text('$' + $('input.my-tip').val() + ' / wk');
-        $('.weekly-gift').css('backgroundColor', '#CC9312');
     });
-    
+
+    // highlight radio selection    
     $paymentOption = $('#payment-method input:radio[name=payment-option]');
     $paymentOption.click(function(e) {
         $paymentOption.each(function (index, item){
@@ -131,18 +137,26 @@ Gittip.tips.init = function() {
         });
     });
 
+    // connect to coinbase
+    $('.promo-bar a.coinbase').click(function(e) {
+        e.preventDefault();
+        Gittip.payments.cb.init(marketplace_uri, participant_username);
+    });
+
+    // payment method selection
     $('#payment-method .primary').click(function(e) {
         e.preventDefault();
 
         if($('input:radio[name=payment-option]:checked').val() == 'coinbase') {
-            // Gittip.payments.cb.init(marketplace_uri, participant_username);
+            Gittip.payments.cb.init(marketplace_uri, participant_username);
             $('#payment-method-dialog').hide();
         } else {
             window.location.href="/credit-card.html"
         }
     });
 
-    $('#payment-method .secondary, #payment-method-dialog .overlay').click(function(e) {
+    // close payment method dialog
+    $('#payment-method .close, #payment-method .secondary, #payment-method-dialog .overlay').click(function(e) {
         $('#payment-method-dialog').hide();
     });
 };
