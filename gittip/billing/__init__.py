@@ -79,13 +79,15 @@ def associate(db, thing, username, balanced_account_uri, balanced_thing_uri):
         if thing == "credit card":
             SQL %= "bill"
             obj = balanced.Card.fetch(balanced_thing_uri)
-            #add = balanced_account.add_card
 
-        else:
-            assert thing == "bank account", thing # sanity check
+        elif thing == "bank account":
             SQL %= "ach"
             obj = balanced.BankAccount.fetch(balanced_thing_uri)
-            #add = balanced_account.add_bank_account
+
+        else:
+            assert thing == "coinbase", thing  # sanity check
+            SQL %= "coinbase"
+            obj = balanced.ExternalAccount.fetch(balanced_thing_uri)
 
         obj.associate_to_customer(balanced_account)
     except balanced.exc.HTTPError as err:
@@ -135,6 +137,7 @@ def clear(db, thing, username, balanced_account_uri):
 
 
 def store_error(db, thing, username, msg):
+    # TODO: make this store coinbase errors
     typecheck(thing, unicode, username, unicode, msg, unicode)
     assert thing in ("credit card", "bank account"), thing
     ERROR = """\
@@ -297,3 +300,16 @@ class BalancedBankAccount(BalancedThing):
             return None
 
         return self._get(mapper[item])
+
+
+class BalancedExternalAccount(BalancedThing):
+
+    thing_type = 'external_account'
+
+    def __getitem__(self, item):
+        item = {
+            'id': 'href',
+            'customer_href': 'customer.href',
+        }.get(item, item)
+
+        return self._get(item)
