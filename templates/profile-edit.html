@@ -5,7 +5,7 @@
         <h2>You are
             <span class="view">{{ user.participant.username|e }}</span>
             <input tabindex="100" type="text" name="username" value="{{ user.participant.username|e }}"/>
-            <a href="#" tabindex="101" class="edit">Edit</a>
+            <button tabindex="101" class="edit">Edit</button>
         </h2>
 
 
@@ -33,7 +33,7 @@
     <!-- Statement -->
     <form class="statement">
         <h2>Statement
-            <a href="#" tabindex="200" class="edit">Edit</a>
+            <button tabindex="200" class="edit">Edit</button>
         </h2>
 
         <div class="edit">
@@ -83,7 +83,7 @@
     <!-- Funding Goal -->
     <form class="goal">
         <h2>Funding Goal
-            <a href="#" tabindex="400" class="edit">Edit</a>
+            <button tabindex="400" class="edit">Edit</button>
         </h2>
         <div class="view">
             {% if user.participant.goal > 0 %}
@@ -151,8 +151,8 @@
       <h2>API Key</h2>
       <div><span>xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx</span></div>
       <div class="buttons">
-        <button class="show small">Show Key</button>
-        <button class="recreate small">Recreate</button>
+        <button class="show">Show Key</button>
+        <button class="recreate">Recreate</button>
       </div>
       <a href="https://github.com/gittip/www.gittip.com#api">API docs</a>
     </div>
