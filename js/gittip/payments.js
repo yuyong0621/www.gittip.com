@@ -18,7 +18,6 @@ Gittip.payments.havePayments = false;
 Gittip.payments.processorAttempts = 0;
 
 Gittip.payments.submitDeleteForm = function(e) {
-    console.log('called');
     var item = $("#payout").length ? "bank account" : "credit card";
     var slug = $("#payout").length ? "bank-account" : "credit-card";
     var msg = "Are you sure you want to remove " + item + "?";

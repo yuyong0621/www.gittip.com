@@ -48,7 +48,7 @@ button, .btn {
     }
     
     &:hover {
-        &:disabled {
+        &.primary:disabled {
             background-color: $green !important;
         }
 
