@@ -39,17 +39,7 @@ else:
                              , u"coinbase"
                              , user.participant.username
                              , user.participant.balanced_account_uri
-                             , coi
-                              )
-
-
-    card_uri = body['card_uri']
-
-    error = billing.associate( website.db
-                             , u"credit card"
-                             , user.participant.username
-                             , user.participant.balanced_account_uri
-                             , card_uri
+                             , coinbase_uri
                               )
 
     if error:

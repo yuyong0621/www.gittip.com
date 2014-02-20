@@ -109,11 +109,15 @@ def invalidate_on_balanced(thing, balanced_account_uri):
     See: https://github.com/balanced/balanced-api/issues/22
 
     """
-    assert thing in ("credit card", "bank account")
+    assert thing in ("credit card", "bank account", "coinbase")
     typecheck(balanced_account_uri, (str, unicode))
 
     customer = balanced.Customer.fetch(balanced_account_uri)
-    things = customer.cards if thing == "credit card" else customer.bank_accounts
+    things = {
+        "credit card": customer.cards,
+        "bank account": customer.bank_accounts,
+        "coinbase": customer.external_accounts
+    }[thing]
 
     for _thing in things:
         _thing.unstore()
@@ -126,13 +130,18 @@ def clear(db, thing, username, balanced_account_uri):
               )
     assert thing in ("credit card", "bank account"), thing
     invalidate_on_balanced(thing, balanced_account_uri)
+    sql = {
+        "credit card": "bill",
+        "bank account": "ach",
+        "coinbase": "coinbase"
+    }[thing]
     CLEAR = """\
 
         UPDATE participants
            SET last_%s_result=NULL
          WHERE username=%%s
 
-    """ % ("bill" if thing == "credit card" else "ach")
+    """ % sql
     db.run(CLEAR, (username,))
 
 
