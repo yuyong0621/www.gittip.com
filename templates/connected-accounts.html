@@ -113,25 +113,6 @@
 <h2>One-off {{ 'Receiving' if user.participant == participant else 'Giving' }} Options</h2>
 <table>
     <tr>
-      <td class="account-type">
-        <img src="/assets/venmo.png" />
-      </td>
-      <td class="account-details">
-        <div class="account-type">Venmo</div>
-        {% if venmo_account == None %}
-            <span class="none">none</span>
-            {% if not user.ANON and user.participant == participant %}
-                <a class="btn small" href="{{ venmo.oauth_url(website) }}">+ Add</a>
-            {% endif %}
-        {% else %}
-            <a href="{{ venmo_account.get_url() }}">
-              {{ venmo_account.get_user_name() }}
-              ({{ venmo_account.get_display_name() }})
-            </a>
-        {% endif %}
-      </td>
-    </tr>
-    <tr>
         <td class="account-type">
             <img src="/assets/bitcoin.png" />
         </td>
@@ -173,6 +154,25 @@
             </form>
 
         </td>
+    </tr>
+    <tr>
+      <td class="account-type">
+        <img src="/assets/venmo.png" />
+      </td>
+      <td class="account-details">
+        <div class="account-type">Venmo</div>
+        {% if venmo_account == None %}
+            <span class="none">none</span>
+            {% if not user.ANON and user.participant == participant %}
+                <a class="btn small" href="{{ venmo.oauth_url(website) }}">+ Add</a>
+            {% endif %}
+        {% else %}
+            <a href="{{ venmo_account.get_url() }}">
+              {{ venmo_account.get_user_name() }}
+              ({{ venmo_account.get_display_name() }})
+            </a>
+        {% endif %}
+      </td>
     </tr>
 </table>
 
