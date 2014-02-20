@@ -26,6 +26,7 @@ form.my-tip {
                 color: $light-gray;
 
                 &:focus {
+                    color: $black;
                     outline: none;
                 }
             }
