@@ -78,8 +78,9 @@ Gittip.tips.init = function() {
         if (amount == oldAmount)
             return;
 
-        if(isAnon)
+        if(isAnon) {
             alert("Please sign in first");
+        }
         else {
             // send request to change tip
             $.post('/' + tippee + '/tip.json', { amount: amount }, function(data) {
@@ -99,30 +100,31 @@ Gittip.tips.init = function() {
                     $('.on-elsewhere .ready .number').text(
                         parseInt($('.on-elsewhere .ready .number').text(),10) + 1);
 
+                if (has_payment_method) {
+                    // show payment method dialog
+                    $('#payment-method-dialog').show();
+                    $("#payment-method").css({
+                        "marginLeft": -($("#payment-method").width()/2),
+                        "marginTop": -($("#payment-method").height()/2)
+                    });
+                }
+
                 // update quick stats
                 $('.quick-stats a').text('$' + data.total_giving + '/wk');
+
+                // show confirmation message once
+                if ($('.box').has(".confirm").length == 0){
+                    var notice = $('<div class="confirm">Your weekly gift has been updated.</div>');
+                    $('.nav').after(notice);
+                }
+                // update amount
+                $('.weekly-gift .amount').text('$' + $('input.my-tip').val() + ' / wk');
             })
             .fail(function() {
                 alert('Sorry, something went wrong while changing your tip. :(');
                 console.log.apply(console, arguments);
             })
         }
-        // show payment method dialog
-        if (has_payment_method) {
-            $('#payment-method-dialog').show();
-            $("#payment-method").css({
-                "marginLeft": -($("#payment-method").width()/2),
-                "marginTop": -($("#payment-method").height()/2)
-            });
-        }
-        // show confirmation message once
-        if ($('.box').has(".confirm").length == 0){
-            var notice = $('<div class="confirm">Your weekly gift has been updated.</div>');
-            $('.nav').after(notice);
-        }
-
-        // update amount
-        $('.weekly-gift .amount').text('$' + $('input.my-tip').val() + ' / wk');
     });
 
     // highlight radio selection    

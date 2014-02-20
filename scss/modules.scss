@@ -75,9 +75,14 @@ a.mini-user:hover {
         font-style: italic;
         color: $light-gray;
     }
+    #cc-delete, #cb-delete, #ba-delete {
+        display: inline-block;
+        float: right;
+        margin-top: -13px;
+    }
     a.btn {
         float: right;
-        margin-top: -6px;
+        margin-top: -13px;
     }
     table {
         width: 100%;
@@ -111,9 +116,24 @@ a.mini-user:hover {
         clear: both;
         color: $gray;
         text-transform: uppercase;
+        padding: 3px 0;
     }
     .account-details {
         padding: 10px;
+        position: relative;
+    }
+    .close {
+        position: absolute;
+        background-image: url("/assets/close_button.png");
+        background-size: cover;
+        width: 15px;
+        height: 15px;
+        top: 25px;
+        right: 20px;
+
+        &:hover {
+            cursor: pointer;
+        }        
     }
     .payments-by {
         background-image: url("/assets/payments-by.png");
