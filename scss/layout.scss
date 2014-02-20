@@ -109,9 +109,10 @@
     text-align: center;
     background: white;
     margin: -80px auto 0;
-    border: 5px solid rgba($brown, 0.7);
+    border: 5px solid rgba($brown, 0.4);
     width: 480px;
     max-width: 100%;
+    @include border-radius(3px);
     position: relative;
     z-index: 2;
 
@@ -260,9 +261,6 @@
         }
         */
     }
-    .profile-nav {
-        padding-bottom: 10px;
-    }
     .weekly-gift {
         padding: 10px;
         width: 100%;
@@ -286,6 +284,14 @@
 
     .nav {
         padding: 10px;
+
+        h2 {
+            color: $black;
+            font: bold 10px $Helvetica;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin: 0 0 3px;
+        }
 
         button.larger {
             font-size: 14px;

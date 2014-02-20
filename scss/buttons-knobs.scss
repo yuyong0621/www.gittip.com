@@ -18,7 +18,6 @@ button, .btn {
     border: 0;
     color: white;
     font: bold 12px $Helvetica;
-    text-transform: uppercase;
     padding: 5px 8px;
     margin: 0 0 0 1px;
     @include border-radius(3px);
@@ -36,6 +35,7 @@ button, .btn {
     &.large {
         padding: 10px 50px;
         margin: 15px 0;
+        text-transform: uppercase;
     }
 
     &:disabled {
