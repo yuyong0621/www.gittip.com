@@ -18,9 +18,8 @@ button, .btn {
     border: 0;
     color: white;
     font: bold 12px $Helvetica;
-    padding: 10px 50px;
-    text-transform: uppercase;
-    margin: 15px 0;
+    padding: 5px 8px;
+    margin: 0 0 0 1px;
     @include border-radius(3px);
     cursor: pointer;
     display: inline;
@@ -33,10 +32,10 @@ button, .btn {
         background-color: $light-gray;
     }
 
-    &.small {
-        padding: 5px 8px;
-        margin: 0 0 0 1px;
-        background-color: $gray;
+    &.large {
+        padding: 10px 50px;
+        margin: 15px 0;
+        text-transform: uppercase;
     }
 
     &:disabled {
@@ -49,7 +48,7 @@ button, .btn {
     }
     
     &:hover {
-        &:disabled {
+        &.primary:disabled {
             background-color: $green !important;
         }
 

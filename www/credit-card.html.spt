@@ -166,7 +166,7 @@ title = "Credit Card"
             </div>
 
             <div class="nav level-1">
-                <button class="selected larger" id="save"
+                <button class="selected large" id="save"
                     type="submit">Update card</button>
             </div>
 

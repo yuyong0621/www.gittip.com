@@ -190,7 +190,7 @@ title = "Bank Account"
             </div>
 
             <div class="nav level-1">
-                <button class="selected larger" id="save"
+                <button class="selected large" id="save"
                     type="submit">Update bank account</button>
             </div>
         </form>
