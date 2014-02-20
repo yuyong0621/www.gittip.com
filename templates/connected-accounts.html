@@ -1,5 +1,5 @@
 <div id="accounts">
-<h2>User Logins</h2>
+<h2>Social Profiles</h2>
 <table>
     <tr>
         <td class="account-type">
@@ -16,7 +16,7 @@
             {% else %}
             <a rel="me" href="{{ twitter_account.get_url() }}">
                 {{ twitter_account.user_info.get('screen_name')|e }}
-                
+
                 {% if twitter_account.user_info.get('name') and twitter_account.user_info.get('name') != twitter_account.user_info.get('screen_name') %}
                     ({{ twitter_account.user_info.get('name')|e }})
                 {% endif %}
@@ -90,6 +90,29 @@
       </td>
     </tr>
     <tr>
+        <td class="account-type">
+            <img src="/assets/openstreetmap.png" />
+        </td>
+        <td class="account-details">
+            <div class="account-type">OpenStreetMap</div>
+            {% if openstreetmap_account == None %}
+                <span class="none">none</span>
+                {% if not user.ANON and user.participant == participant %}
+                    <a class="btn small" href="{{ openstreetmap.oauth_url(website, unicode('connect'))|e }}">+ Add</a>
+                {% endif %}
+            {% else %}
+            <a rel="me" href="{{ openstreetmap_account.user_info.get('html_url', '')|e }}">
+            {{ openstreetmap_account.user_info.get('username')|e }}
+            </a>
+
+            {% endif %}
+        </td>
+    </tr>
+</table>
+
+<h2>One-off {{ 'Receiving' if user.participant == participant else 'Giving' }} Options</h2>
+<table>
+    <tr>
       <td class="account-type">
         <img src="/assets/venmo.png" />
       </td>
@@ -110,27 +133,51 @@
     </tr>
     <tr>
         <td class="account-type">
-            <img src="/assets/openstreetmap.png" />
+            <img src="/assets/bitcoin.png" />
         </td>
         <td class="account-details">
-            <div class="account-type">OpenStreetMap</div>
-            {% if openstreetmap_account == None %}
-                <span class="none">none</span>
-                {% if not user.ANON and user.participant == participant %}
-                    <a class="btn small" href="{{ openstreetmap.oauth_url(website, unicode('connect'))|e }}">+ Add</a>
-                {% endif %}
+            <div class="account-type">Bitcoin</div>
+            {% if not user.ANON and user.participant == participant %}
+                <div class="bitcoin">
             {% else %}
-            <a rel="me" href="{{ openstreetmap_account.user_info.get('html_url', '')|e }}">
-            {{ openstreetmap_account.user_info.get('username')|e }}
-            </a>
-            
+                <div>
             {% endif %}
+                {% if participant.bitcoin_address %}
+                    <a rel="me" href="http://blockchain.info/address/{{ participant.bitcoin_address }}">
+                      {{ participant.bitcoin_address }}
+                    </a>
+                    {% if not user.ANON and user.participant == participant %}
+
+                    <a href="javascript:;" class="edit-bitcoin btn small toggle-bitcoin">Edit</a>
+                    {% endif %}
+
+                {% else %}
+                    <span class="none">none</span>
+                    {% if not user.ANON and user.participant == participant %}
+                        <a class="btn small toggle-bitcoin" href="javascript:;">+ Add</a>
+                    {% endif %}
+                {% endif %}
+            </div>
+            <form class="bitcoin-submit">
+                <div class="address">
+                    <input type="text" class="bitcoin hidden"
+                        {% if participant.bitcoin_address %}
+                            value="{{ participant.bitcoin_address }}"
+                        {% endif %}
+                    >
+                </div>
+                <div class="buttons">
+                    <button type="submit" class="small bitcoin hidden">Save</button>
+                    <button type="cancel" class="small bitcoin cancel hidden">Cancel</button>
+                </div>
+            </form>
+
         </td>
     </tr>
 </table>
 
 {% if not user.ANON and user.participant == participant %}
-<h2>Send money
+<h2>Adding Money
     {% if user.ADMIN and participant.balanced_account_uri %}
         <a href="https://dashboard.balancedpayments.com/#/{{ participant.balanced_account_uri[4:] }}" title="Go to Balanced Dashboard"><div class="payments-by"></div></a>
     {% else %}
@@ -181,7 +228,7 @@
     </tr>
 </table>
 
-<h2>Receive money
+<h2>Withdrawing Money
     {% if user.ADMIN and participant.balanced_account_uri %}
         <a href="https://dashboard.balancedpayments.com/#/{{ participant.balanced_account_uri[4:] }}" title="Go to Balanced Dashboard"><div class="payments-by"></div></a>
     {% else %}
@@ -207,49 +254,6 @@
                     </form>
                 </div>
             {% endif %}
-        </td>
-    </tr>
-    <tr>
-        <td class="account-type">
-            <img src="/assets/bitcoin.png" />
-        </td>
-        <td class="account-details">
-            <div class="account-type">Bitcoin</div>
-            {% if not user.ANON and user.participant == participant %}
-                <div class="bitcoin">
-            {% else %}
-                <div>
-            {% endif %}
-                {% if participant.bitcoin_address %}
-                    <a rel="me" href="http://blockchain.info/address/{{ participant.bitcoin_address }}">
-                      {{ participant.bitcoin_address }}
-                    </a>
-                    {% if not user.ANON and user.participant == participant %}
-
-                    <a href="javascript:;" class="edit-bitcoin btn small toggle-bitcoin">Edit</a>
-                    {% endif %}
-
-                {% else %}
-                    <span class="none">none</span>
-                    {% if not user.ANON and user.participant == participant %}
-                        <a class="btn small toggle-bitcoin" href="javascript:;">+ Add</a>
-                    {% endif %}
-                {% endif %}
-            </div>
-            <form class="bitcoin-submit">
-                <div class="address">
-                    <input type="text" class="bitcoin hidden"
-                        {% if participant.bitcoin_address %}
-                            value="{{ participant.bitcoin_address }}"
-                        {% endif %}
-                    >
-                </div>
-                <div class="buttons">
-                    <button type="submit" class="small bitcoin hidden">Save</button>
-                    <button type="cancel" class="small bitcoin cancel hidden">Cancel</button>
-                </div>
-            </form>
-
         </td>
     </tr>
 </table>
