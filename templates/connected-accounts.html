@@ -192,8 +192,13 @@
         <td class="account-details">
             <div class="account-type">Credit card</div>
             {% if participant.last_bill_result != "" %}
-                <span class="none">none</span>
-                <a class="btn small" href="/credit-card.html">+ Add</a>
+                {% if participant.last_coinbase_result != "" %}
+                    <span class="none">none</span>
+                    <a class="btn small" href="/credit-card.html">+ Add</a>
+                {% else %}
+                    <span class="none">(Delete your coinbase account first)</span>
+                    <a class="btn small disabled">+ Add</a>
+                {% endif %}                    
             {% else %}
                 {{ card['brand'] }} {{ card['number'][-4:] }}
                     <div id="cc-delete">
