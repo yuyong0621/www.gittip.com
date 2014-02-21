@@ -18,8 +18,19 @@ Gittip.payments.havePayments = false;
 Gittip.payments.processorAttempts = 0;
 
 Gittip.payments.submitDeleteForm = function(e) {
-    var item = $("#payout").length ? "bank account" : "credit card";
-    var slug = $("#payout").length ? "bank-account" : "credit-card";
+    var item, slug;
+    var type = e.target.id.slice(-2);
+    if (type == "cc") {
+        item = "credit card";
+        slug = "credit-card";
+    } else if (type == "ba") {
+        item = "bank account";
+        slug = "bank-account";
+    } else if (type == "cb") {
+        item = "coinbase account";
+        slug = "coinbase";
+    }
+
     var msg = "Are you sure you want to remove " + item + "?";
     if (!confirm(msg)) {
         e.stopPropagation();
@@ -32,7 +43,9 @@ Gittip.payments.submitDeleteForm = function(e) {
         , data: {action: "delete"}
         , type: "POST"
         , success: function() {
-            window.location.href = '/' + slug + '.html';
+            if (type !== "cb") {
+                window.location.href = '/' + slug + '.html';    
+            }
           }
         , error: function(x,y,z) {
             select(cur);
@@ -373,9 +386,6 @@ Gittip.payments.cb.init = function(balanced_uri, participantId) {
     });
 };
 Gittip.payments.cb.handleResponse = function(response) {
-        var coinbase_confirm = '<div class="confirm">Successfully connected to your Coinbase account.</div>';
-        $('#hero').prepend(coinbase_confirm);
-
     if (response.status_code !== 201) {
         var msg = response.status.toString() + " " + response.error.description;
         jQuery.ajax(
@@ -396,6 +406,7 @@ Gittip.payments.cb.handleResponse = function(response) {
      */
 
     function success() {
+        $('html, body').animate({scrollTop: 0}, 500);
         var coinbase_confirm = '<div class="confirm">Successfully connected to your Coinbase account.</div>';
         $('#hero').prepend(coinbase_confirm);
     }
@@ -420,6 +431,15 @@ Gittip.payments.cb.handleResponse = function(response) {
                         );
 }
 
+
+// templates/connected-accounts.html
+// ============
+
+// connect to coinbase
+$('#connect-coinbase').click(function (e) {
+    e.preventDefault();
+    Gittip.payments.cb.init(marketplace_uri, participant_username);
+});
 // for delete buttons in connected-accounts.html
 $('#cc-delete .close').click(Gittip.payments.submitDeleteForm);
 $('#ba-delete .close').click(Gittip.payments.submitDeleteForm);

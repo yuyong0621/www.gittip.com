@@ -199,7 +199,7 @@
                     <div id="cc-delete">
                         <form action="credit-card.json" class="special" method="POST">
                             <input type="hidden" name="action" value="delete">
-                            <div class="close" title="Delete card"></div>
+                            <div id="delete-cc" class="close" title="Delete card"></div>
                         </form>
                     </div>
 
@@ -212,15 +212,20 @@
         </td>
         <td class="account-details">
             <div class="account-type">Coinbase</div>
-            {% if participant.last_ach_result != "" %}
-                <span class="none">none</span>
-                <a class="btn small" id="connect-coinbase" href="#">+ Add</a>
+            {% if participant.last_coinbase_result != "" %}
+                {% if participant.last_bill_result != "" %}
+                    <span class="none">none</span>
+                    <a class="btn small" id="connect-coinbase" href="#">+ Add</a>
+                {% else %}
+                    <span class="none">(Delete your credit card first)</span>
+                    <a class="btn small disabled" id="connect-coinbase">+ Add</a>
+                {% endif %}
             {% else %}
                 <span class="none">connected</span>
                 <div id="cb-delete">
                     <form action="bank-account.json" class="special" method="POST">
                         <input type="hidden" name="action" value="delete">
-                        <div class="close" title="Delete card"></div>
+                        <div id="delete-cb" class="close" title="Delete card"></div>
                     </form>
                 </div>
             {% endif %}
@@ -250,7 +255,7 @@
                 <div id="ba-delete">
                     <form action="bank-account.json" class="special" method="POST">
                         <input type="hidden" name="action" value="delete">
-                        <div class="close" title="Delete card"></div>
+                        <div id="delete-ba" class="close" title="Delete card"></div>
                     </form>
                 </div>
             {% endif %}
