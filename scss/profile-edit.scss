@@ -71,9 +71,10 @@
         }
     }
     .bitcoin {
-        font-size: 13px;
+        .address {
+            font-size: 13px;    
+        }
         
-
         .edit-bitcoin {
             text-transform: uppercase;
             font-weight: bold;

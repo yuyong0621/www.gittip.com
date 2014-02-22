@@ -123,21 +123,22 @@
             {% else %}
                 <div>
             {% endif %}
-                {% if participant.bitcoin_address %}
-                    <a rel="me" href="http://blockchain.info/address/{{ participant.bitcoin_address }}">
-                      {{ participant.bitcoin_address }}
-                    </a>
-                    {% if not user.ANON and user.participant == participant %}
 
-                    <a href="javascript:;" class="edit-bitcoin btn small toggle-bitcoin">Edit</a>
-                    {% endif %}
+            {% if participant.bitcoin_address %}
+                <a class="address" rel="me" href="http://blockchain.info/address/{{ participant.bitcoin_address }}">
+                  {{ participant.bitcoin_address }}
+                </a>
+                {% if not user.ANON and user.participant == participant %}
 
-                {% else %}
-                    <span class="none">none</span>
-                    {% if not user.ANON and user.participant == participant %}
-                        <a class="btn small toggle-bitcoin" href="javascript:;">+ Add</a>
-                    {% endif %}
+                <a href="javascript:;" class="edit-bitcoin btn small toggle-bitcoin">Edit</a>
                 {% endif %}
+
+            {% else %}
+                <span class="none">none</span>
+                {% if not user.ANON and user.participant == participant %}
+                    <a class="btn small toggle-bitcoin" href="javascript:;">+ Add</a>
+                {% endif %}
+            {% endif %}
             </div>
             <form class="bitcoin-submit">
                 <div class="address">
