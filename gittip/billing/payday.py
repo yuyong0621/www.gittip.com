@@ -18,6 +18,7 @@ single transaction.
 """
 from __future__ import unicode_literals
 
+import sys
 from decimal import Decimal, ROUND_UP
 
 import balanced
@@ -521,11 +522,11 @@ class Payday(object):
         typecheck(participant, Participant, amount, Decimal)
 
         username = participant.username
-        balanced_account_uri = participant.balanced_account_uri
+        balanced_customer_href = participant.balanced_customer_href
         stripe_customer_id = participant.stripe_customer_id
 
         typecheck( username, unicode
-                 , balanced_account_uri, (unicode, None)
+                 , balanced_customer_href, (unicode, None)
                  , stripe_customer_id, (unicode, None)
                   )
 
@@ -533,7 +534,7 @@ class Payday(object):
         # Perform some last-minute checks.
         # ================================
 
-        if balanced_account_uri is None and stripe_customer_id is None:
+        if balanced_customer_href is None and stripe_customer_id is None:
             self.mark_missing_funding()
             return      # Participant has no funding source.
 
@@ -544,9 +545,9 @@ class Payday(object):
         # Go to Balanced or Stripe.
         # =========================
 
-        if balanced_account_uri is not None:
+        if balanced_customer_href is not None:
             things = self.charge_on_balanced( username
-                                            , balanced_account_uri
+                                            , balanced_customer_href
                                             , amount
                                              )
             charge_amount, fee, error = things
@@ -618,32 +619,32 @@ class Payday(object):
         # ===========================
 
         try:
-            balanced_customer_href = participant.balanced_account_uri
+            balanced_customer_href = participant.balanced_customer_href
             if balanced_customer_href is None:
                 log("%s has no balanced_customer_href."
                     % participant.username)
                 return  # not in Balanced
 
             customer = balanced.Customer.fetch(balanced_customer_href)
-            if customer.merchant_status == 'underwritten':
-                log("%s is not a merchant." % participant.username)
-                return  # not a merchant
-
             customer.bank_accounts.one()\
                                   .credit(amount=cents,
                                           description=participant.username)
 
-            error = ""
             log(msg + "succeeded.")
+            error = ""
         except balanced.exc.HTTPError as err:
-            error = err.message
+            error = err.message.message
+        except:
+            error = repr(sys.exc_info()[1])
+
+        if error:
             log(msg + "failed: %s" % error)
 
         self.record_credit(credit_amount, fee, error, participant.username)
 
 
     def charge_on_balanced(self, username, balanced_customer_href, amount):
-        """We have a purported balanced_account_uri. Try to use it.
+        """We have a purported balanced_customer_href. Try to use it.
         """
         typecheck( username, unicode
                  , balanced_customer_href, unicode
@@ -655,18 +656,19 @@ class Payday(object):
 
         try:
             customer = balanced.Customer.fetch(balanced_customer_href)
-            source = customer.cards.first()
-            if not source:
-                source = customer.external_accounts.first()
-            if source:
-                source.debit(amount=cents, description=username)
-                log(msg + "succeeded.")
-                log("Cusotmer: {} {} token: {}".format(username, customer.href, source.href))
-                error = ""
-            else:
-                error = "Does not have a funding source"
+            try:
+                source = customer.cards.one()
+            except balanced.exc.NoResultFound:
+                source = customer.external_accounts.one()
+            source.debit(amount=cents, description=username)
+            log(msg + "succeeded.")
+            error = ""
         except balanced.exc.HTTPError as err:
             error = err.message.message
+        except:
+            error = repr(sys.exc_info()[1])
+
+        if error:
             log(msg + "failed: %s" % error)
 
         return charge_amount, fee, error

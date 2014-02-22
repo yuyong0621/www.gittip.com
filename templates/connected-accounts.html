@@ -106,6 +106,9 @@
             </a>
 
             {% endif %}
+            <div class="account-type">{% if user.ADMIN and participant.balanced_customer_href %}
+                <a href="https://dashboard.balancedpayments.com/#/{{ participant.balanced_customer_href[4:] }}"
+                    >on Balanced Payments</a>{% else %}on Balanced Payments{% endif %}</div>
         </td>
     </tr>
 </table>
@@ -179,8 +182,8 @@
 
 {% if not user.ANON and user.participant == participant %}
 <h2>Adding Money
-    {% if user.ADMIN and participant.balanced_account_uri %}
-        <a href="https://dashboard.balancedpayments.com/#/{{ participant.balanced_account_uri[4:] }}" title="Go to Balanced Dashboard"><div class="payments-by"></div></a>
+    {% if user.ADMIN and participant.balanced_customer_href %}
+        <a href="https://dashboard.balancedpayments.com/#/{{ participant.balanced_customer_href }}" title="Go to Balanced Dashboard"><div class="payments-by"></div></a>
     {% else %}
         <div class="payments-by"></div>
     {% endif %}
@@ -199,7 +202,7 @@
                 {% else %}
                     <span class="none">(Delete your coinbase account first)</span>
                     <a class="btn small disabled">+ Add</a>
-                {% endif %}                    
+                {% endif %}
             {% else %}
                 {{ card['brand'] }} {{ card['number'][-4:] }}
                     <div id="cc-delete">
@@ -240,8 +243,8 @@
 </table>
 
 <h2>Withdrawing Money
-    {% if user.ADMIN and participant.balanced_account_uri %}
-        <a href="https://dashboard.balancedpayments.com/#/{{ participant.balanced_account_uri[4:] }}" title="Go to Balanced Dashboard"><div class="payments-by"></div></a>
+    {% if user.ADMIN and participant.balanced_customer_href %}
+        <a href="https://dashboard.balancedpayments.com/#/{{ participant.balanced_customer_href }}" title="Go to Balanced Dashboard"><div class="payments-by"></div></a>
     {% else %}
         <div class="payments-by"></div>
     {% endif %}

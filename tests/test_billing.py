@@ -1,89 +1,16 @@
-from __future__ import unicode_literals
-
-import os
+from __future__ import absolute_import, division, print_function, unicode_literals
 
 import balanced
 import mock
-import vcr
 
 from gittip import billing
 from gittip.security import authentication
 from gittip.testing import Harness
+from gittip.testing.balanced import BalancedHarness
 from gittip.models.participant import Participant
 
 
-def setUp_balanced(o):
-    o.vcr = vcr.VCR(
-        cassette_library_dir = os.path.dirname(os.path.realpath(__file__)) + '/fixtures/',
-        record_mode = 'once',
-        match_on = ['url', 'method'],
-    )
-    o.vcr_cassette = o.vcr.use_cassette('{}.yml'.format(o.__name__)).__enter__()
-    o.balanced_marketplace = balanced.Marketplace.my_marketplace
-
-
-def setUp_balanced_resources(o):
-    o.balanced_customer_href = unicode(balanced.Customer().save().href)
-    o.card_href = unicode(balanced.Card(
-        number='4111111111111111',
-        expiration_month=10,
-        expiration_year=2020,
-        address={
-            'line1': "123 Main Street",
-            'state': 'Confusion',
-            'postal_code': '90210',
-        },
-        # gittip stores some of the address data in the meta fields,
-        # continue using them to support backwards compatibility
-        meta={
-            'address_2': 'Box 2',
-            'city_town': '',
-            'region': 'Confusion',
-        }
-    ).save().href)
-    o.bank_account_href = unicode(balanced.BankAccount(
-        name='Homer Jay',
-        account_number='112233a',
-        routing_number='121042882',
-    ).save().href)
-
-
-def tearDown_balanced(o):
-    o.vcr_cassette.__exit__(None, None, None)
-
-class TestBillingBase(Harness):
-
-    @classmethod
-    def setUpClass(cls):
-        super(TestBillingBase, cls).setUpClass()
-        setUp_balanced(cls)
-
-    @classmethod
-    def tearDownClass(cls):
-        tearDown_balanced(cls)
-        super(TestBillingBase, cls).tearDownClass()
-
-    def setUp(self):
-        Harness.setUp(self)
-        setUp_balanced_resources(self)
-        self.alice = self.make_participant('alice', elsewhere='github')
-
-
-class TestBalancedCard(Harness):
-
-    @classmethod
-    def setUpClass(cls):
-        super(TestBalancedCard, cls).setUpClass()
-        setUp_balanced(cls)
-
-    def setUp(self):
-        Harness.setUp(self)
-        setUp_balanced_resources(self)
-
-    @classmethod
-    def tearDownClass(cls):
-        tearDown_balanced(cls)
-        super(TestBalancedCard, cls).tearDownClass()
+class TestBalancedCard(BalancedHarness):
 
     def test_balanced_card_basically_works(self):
         balanced.Card.fetch(self.card_href) \
@@ -140,6 +67,7 @@ class TestBalancedCard(Harness):
 
 
 class TestStripeCard(Harness):
+
     @mock.patch('stripe.Customer')
     def test_stripe_card_basically_works(self, sc):
         active_card = {}
@@ -180,22 +108,7 @@ class TestStripeCard(Harness):
         assert actual == expected
 
 
-class TestBalancedBankAccount(Harness):
-
-    @classmethod
-    def setUpClass(cls):
-        super(TestBalancedBankAccount, cls).setUpClass()
-        setUp_balanced(cls)
-
-    def setUp(self):
-        Harness.setUp(self)
-        setUp_balanced_resources(self)
-
-    @classmethod
-    def tearDownClass(cls):
-        tearDown_balanced(cls)
-        super(TestBalancedBankAccount, cls).tearDownClass()
-
+class TestBalancedBankAccount(BalancedHarness):
 
     def test_balanced_bank_account(self):
         balanced.BankAccount.fetch(self.bank_account_href)\
@@ -218,22 +131,8 @@ class TestBalancedBankAccount(Harness):
         assert not bank_account['id']
 
 
-class TestBalancedExternalAccount(Harness):
+class TestBalancedExternalAccount(BalancedHarness):
     """Tests related to processing coinbase transactions"""
-
-    @classmethod
-    def setUpClass(cls):
-        super(TestBalancedExternalAccount, cls).setUpClass()
-        setUp_balanced(cls)
-
-    def setUp(self):
-        Harness.setUp(self)
-        setUp_balanced_resources(self)
-
-    @classmethod
-    def tearDownClass(cls):
-        tearDown_balanced(cls)
-        super(TestBalancedExternalAccount, cls).tearDownClass()
 
     def test_balanced_external_account(self):
         ea = balanced.ExternalAccount(
@@ -242,19 +141,19 @@ class TestBalancedExternalAccount(Harness):
         ).save()
         ea.associate_to_customer(self.balanced_customer_href)
 
-        ea_account = billing.BalancedExternalAccount(self.balanced_customer_href)
+        ea_account = billing.BalancedExternalAccount(
+            self.balanced_customer_href)
 
         assert ea_account['customer_href'] == self.balanced_customer_href
 
 
-
-class TestBillingAssociate(TestBillingBase):
+class TestBillingAssociate(BalancedHarness):
 
     def test_associate_valid_card(self):
         billing.associate(self.db, u"credit card", 'alice', None, self.card_href)
 
         user = authentication.User.from_username('alice')
-        customer = balanced.Customer.fetch(user.participant.balanced_account_uri)
+        customer = balanced.Customer.fetch(user.participant.balanced_customer_href)
         cards = customer.cards.all()
         assert len(cards) == 1
         assert cards[0].href == self.card_href
@@ -308,7 +207,7 @@ class TestBillingAssociate(TestBillingBase):
         assert alice.last_ach_result == '404 Client Error: NOT FOUND'
 
 
-class TestBillingClear(TestBillingBase):
+class TestBillingClear(BalancedHarness):
 
     def test_clear(self):
 
@@ -318,7 +217,7 @@ class TestBillingClear(TestBillingBase):
         MURKY = """\
 
             UPDATE participants
-               SET balanced_account_uri='not null'
+               SET balanced_customer_href='not null'
                  , last_bill_result='ooga booga'
              WHERE username=%s
 
@@ -333,7 +232,7 @@ class TestBillingClear(TestBillingBase):
 
         user = authentication.User.from_username('alice')
         assert not user.participant.last_bill_result
-        assert user.participant.balanced_account_uri
+        assert user.participant.balanced_customer_href
 
     def test_clear_bank_account(self):
         balanced.BankAccount.fetch(self.bank_account_href)\
@@ -342,7 +241,7 @@ class TestBillingClear(TestBillingBase):
         MURKY = """\
 
             UPDATE participants
-               SET balanced_account_uri='not null'
+               SET balanced_customer_href='not null'
                  , last_ach_result='ooga booga'
              WHERE username=%s
 
@@ -357,10 +256,11 @@ class TestBillingClear(TestBillingBase):
 
         user = authentication.User.from_username('alice')
         assert not user.participant.last_ach_result
-        assert user.participant.balanced_account_uri
+        assert user.participant.balanced_customer_href
 
 
-class TestBillingStoreError(TestBillingBase):
+class TestBillingStoreError(BalancedHarness):
+
     def test_store_error_stores_bill_error(self):
         billing.store_error(self.db, u"credit card", "alice", "cheese is yummy")
         rec = self.db.one("select * from participants where "

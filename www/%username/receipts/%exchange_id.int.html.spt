@@ -14,7 +14,7 @@ elif user.ADMIN:
 else:
     raise Response(404)
 
-card = BalancedCard(participant.balanced_account_uri)
+card = BalancedCard(participant.balanced_customer_href)
 exchange = website.db.one( "SELECT * FROM exchanges "
                    "WHERE id=%s AND participant=%s"
                  , (path['exchange_id'], path['username'])
@@ -93,7 +93,7 @@ if exchange is None:
     <div id="their-info">
         {{ card['name'] }}
         ({{ participant.username }})<br />
-        {{ card['last4'] }} ({{ card['card_type'] }})<br />
+        {{ card['number'][-4:] }} ({{ card['brand'] }})<br />
         {{ card['address_1'] }}<br />
         {% if card['address_2'] %}
         {{ card['address_2'] }}<br />
