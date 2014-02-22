@@ -258,11 +258,13 @@ class TestPaydayChargeOnBalanced(PaydayHarness):
         ).save()
         card.associate_to_customer(customer_with_bad_card)
 
-        actual = self.payday.charge_on_balanced( 'whatever username'
-                                               , customer_with_bad_card
-                                               , D('10.00')
-                                                )
-        assert actual == (D('10.61'), D('0.61'), '402 Client Error: PAYMENT REQUIRED')
+        charge_amount, fee, err = self.payday.charge_on_balanced( 'whatever username'
+                                                                , customer_with_bad_card
+                                                                , D('10.00')
+                                                                 )
+        assert charge_amount == D('10.61')
+        assert fee == D('0.61')
+        assert 'R758: Account Frozen.' in err
 
     def test_charge_on_balanced_handles_MultipleFoundError(self):
         card = balanced.Card(
