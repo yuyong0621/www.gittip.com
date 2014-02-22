@@ -18,7 +18,7 @@ def setUp_balanced(o):
         record_mode = 'once',
         match_on = ['url', 'method'],
     )
-    #o.vcr_cassette = o.vcr.use_cassette('{}.yml'.format(o.__name__)).__enter__()
+    o.vcr_cassette = o.vcr.use_cassette('{}.yml'.format(o.__name__)).__enter__()
     o.balanced_marketplace = balanced.Marketplace.my_marketplace
 
 
@@ -49,9 +49,7 @@ def setUp_balanced_resources(o):
 
 
 def tearDown_balanced(o):
-    pass
-    #o.vcr_cassette.__exit__(None, None, None)
-
+    o.vcr_cassette.__exit__(None, None, None)
 
 class TestBillingBase(Harness):
 

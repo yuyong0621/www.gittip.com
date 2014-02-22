@@ -211,9 +211,10 @@ class TestPaydayCharge(TestPaydayBase):
         assert carl_debits[0].description == 'carl2'
 
         jeff_debits = jeff_customer.debits.all()
-        import ipdb; ipdb.set_trace()
         assert len(jeff_debits) == 1
         assert jeff_debits[0].amount == 1000
+        assert jeff_debits[0].description == 'jeff2'
+        assert jeff_debits[0].source.id == external_account.id
 
 
 class TestBillingCharges(TestPaydayBase):
