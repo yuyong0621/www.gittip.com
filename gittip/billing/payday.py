@@ -661,6 +661,7 @@ class Payday(object):
             if source:
                 source.debit(amount=cents, description=username)
                 log(msg + "succeeded.")
+                log("Cusotmer: {} {} token: {}".format(username, customer.href, source.href))
                 error = ""
             else:
                 error = "Does not have a funding source"
