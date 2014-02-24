@@ -45,6 +45,7 @@ balanced_customer_href = None
 card = ""
 bank_account = ""
 coinbase = ""
+has_payment_method = (user.participant.last_coinbase_result == "") | (user.participant.last_bill_result == "")
 
 if not user.ANON:
     balanced_customer_href = user.participant.balanced_customer_href
@@ -100,7 +101,8 @@ else:
 <script>
     var marketplace_uri = "{{ balanced.Marketplace.my_marketplace.uri }}";
     var participant_username = "{{ user.participant.username }}";
-    var has_payment_method = "{{ user.participant.last_bill_result }}";
+    var has_payment_method = "{{has_payment_method}}";
+
 </script>
 {% if show_charts %}
 <script>

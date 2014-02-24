@@ -27,7 +27,7 @@ Gittip.payments.submitDeleteForm = function(e) {
         item = "bank account";
         slug = "bank-account";
     } else if (type == "cb") {
-        item = "coinbase account";
+        item = "Coinbase account";
         slug = "coinbase";
     }
 
@@ -37,14 +37,18 @@ Gittip.payments.submitDeleteForm = function(e) {
         e.preventDefault();
         return false;
     }
-
     jQuery.ajax(
         { url: '/' + slug + '.json'
         , data: {action: "delete"}
         , type: "POST"
         , success: function() {
             if (type !== "cb") {
-                window.location.href = '/' + slug + '.html';    
+                window.location.href = '/' + slug + '.html';
+            } else {
+                $('html, body').animate({scrollTop: 0}, 500);
+                var coinbase_confirm = $('<div class="confirm">Successfully deleted your Coinbase account.</div>');
+                $('#hero').prepend(coinbase_confirm);
+                location.reload();
             }
           }
         , error: function(x,y,z) {
@@ -398,16 +402,16 @@ Gittip.payments.cb.handleResponse = function(response) {
         return;
     }
 
-    /* The request to tokenize the bank account succeeded. Now we need to
-     * validate the merchant information. We'll submit it to
-     * /bank-accounts.json and check the response code to see what's going
-     * on there.
-     */
+    $('html, body').animate({scrollTop: 0}, 500);
+    if ($(".confirm").length > 0){
+        $(".confirm").text('Connecting to your Coinbase account..');
+    } else {
+        $('#hero').prepend('<div class="confirm">Connecting to your Coinbase account..</div>');
+    }
 
     function success() {
-        $('html, body').animate({scrollTop: 0}, 500);
-        var coinbase_confirm = '<div class="confirm">Successfully connected to your Coinbase account.</div>';
-        $('#hero').prepend(coinbase_confirm);
+        $('.confirm').text('Successfully connected to your Coinbase account.');
+        location.reload();
     }
 
     function detailedFeedback(data) {
@@ -440,6 +444,4 @@ $('#connect-coinbase').click(function (e) {
     Gittip.payments.cb.init(marketplace_uri, participant_username);
 });
 // for delete buttons in connected-accounts.html
-$('#cc-delete .close').click(Gittip.payments.submitDeleteForm);
-$('#ba-delete .close').click(Gittip.payments.submitDeleteForm);
-$('#cb-delete .close').click(Gittip.payments.submitDeleteForm);
+$('body').on('click', '#cc-delete .close, #ba-delete .close, #cb-delete .close', Gittip.payments.submitDeleteForm);

@@ -106,9 +106,6 @@
             </a>
 
             {% endif %}
-            <div class="account-type">{% if user.ADMIN and participant.balanced_customer_href %}
-                <a href="https://dashboard.balancedpayments.com/#/{{ participant.balanced_customer_href[4:] }}"
-                    >on Balanced Payments</a>{% else %}on Balanced Payments{% endif %}</div>
         </td>
     </tr>
 </table>
@@ -230,7 +227,7 @@
                     <a class="btn small disabled">+ Add</a>
                 {% endif %}
             {% else %}
-                <span class="none">connected</span>
+                <span>Connected</span>
                 <div id="cb-delete">
                     <form action="bank-account.json" class="special" method="POST">
                         <input type="hidden" name="action" value="delete">

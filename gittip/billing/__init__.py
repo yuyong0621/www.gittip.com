@@ -128,7 +128,7 @@ def clear(db, thing, username, balanced_customer_href):
              , username, unicode
              , balanced_customer_href, (unicode, str)
               )
-    assert thing in ("credit card", "bank account"), thing
+    assert thing in ("credit card", "bank account", "coinbase"), thing
     invalidate_on_balanced(thing, balanced_customer_href)
     sql = {
         "credit card": "bill",

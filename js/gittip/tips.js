@@ -99,9 +99,9 @@ Gittip.tips.init = function() {
                 if(!oldAmount)
                     $('.on-elsewhere .ready .number').text(
                         parseInt($('.on-elsewhere .ready .number').text(),10) + 1);
-
-                if (has_payment_method) {
-                    // show payment method dialog
+                
+                // show payment method dialog
+                if (has_payment_method === "False") {
                     $('#payment-method-dialog').show();
                     $("#payment-method").css({
                         "marginLeft": -($("#payment-method").width()/2),
@@ -113,10 +113,12 @@ Gittip.tips.init = function() {
                 $('.quick-stats a').text('$' + data.total_giving + '/wk');
 
                 // show confirmation message once
-                if ($('.box').has(".confirm").length == 0){
-                    var notice = $('<div class="confirm">Your weekly gift has been updated.</div>');
-                    $('.nav').after(notice);
+                if ($(".confirm").length > 0){
+                    $(".confirm").remove();
                 }
+                var notice = $('<div class="confirm">Your weekly gift has been updated.</div>');
+                $('#hero').prepend(notice);
+            
                 // update amount
                 $('.weekly-gift .amount').text('$' + $('input.my-tip').val() + ' / wk');
             })
