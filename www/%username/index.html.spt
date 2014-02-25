@@ -45,7 +45,7 @@ balanced_customer_href = None
 card = ""
 bank_account = ""
 coinbase = ""
-has_payment_method = "False"
+has_payment_method = False
 
 if not user.ANON:
     balanced_customer_href = user.participant.balanced_customer_href
