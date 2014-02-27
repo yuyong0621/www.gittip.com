@@ -10,6 +10,11 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.box = "precise64"
   config.vm.box_url = "http://files.vagrantup.com/precise64.box"
 
+  # Use vagrant-cachier to speed up builds if available.
+  if Vagrant.has_plugin?("vagrant-cachier")
+    config.cache.auto_detect = true
+  end
+
   # Sync the project directory and expose the app
   config.vm.synced_folder ".", "/home/vagrant/#{PROJECT_DIRECTORY}"
   config.vm.network :forwarded_port, guest: 8537, host: 8537
