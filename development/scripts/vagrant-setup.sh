@@ -24,11 +24,21 @@ sudo -i -u postgres sh <<EOF
         --file=/home/vagrant/${PROJECT_DIRECTORY}/create_db.sql
 EOF
 
+cd $PROJECT_DIRECTORY
+
 # Warn if Windows newlines are detected and try to fix the problem
-# TODO
+if grep --quiet --binary --binary-files=without-match $(printf '\r') README.md; then
+    echo
+    cat development/scripts/crlf-warning.txt
+    echo
+
+    echo 'Running "git config core.autocrlf false"'
+    git config core.autocrlf false
+
+    exit 1
+fi
 
 # Set up the environment, the database, and run Gittip
-cd $PROJECT_DIRECTORY
 test -f local.env || cp defaults.env local.env
 make local.env env schema data
 
