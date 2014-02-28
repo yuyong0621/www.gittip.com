@@ -13,10 +13,13 @@ nosetests.xml
 .deps
 .sass-cache/
 gittip.css
-.vagrant
 node_modules/
 .DS_Store
 docs/_build
 docs/gittip
 docs/gittip.rst
 _vimrc_local.vim
+
+# Vagrant
+.vagrant/
+run
