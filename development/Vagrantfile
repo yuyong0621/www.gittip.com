@@ -35,7 +35,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
     chef.json = {
       :postgresql => {
-        :version => "9.2",
+        :version => "9.3",
         :config => {
           :ssl_cert_file => "/etc/ssl/certs/ssl-cert-snakeoil.pem",
           :ssl_key_file => "/etc/ssl/private/ssl-cert-snakeoil.key",
