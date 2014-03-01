@@ -8,14 +8,14 @@ echo "cd /vagrant" > /etc/profile.d/login-directory.sh
 # TODO: Pin apt-get packages to the same versions Heroku uses
 
 # First run only
-if [ ! -f /home/vagrant/created_db ]; then
+if [ ! -f /home/vagrant/.created_db ]; then
     echo "Configuring PostgreSQL..."
     sudo -iu postgres bash <<EOF
         psql \
             --quiet \
             --file=/vagrant/${PROJECT_DIRECTORY}/create_db.sql
 EOF
-    touch /home/vagrant/created_db
+    touch /home/vagrant/.created_db
 fi
 
 cd /vagrant
@@ -39,6 +39,5 @@ sudo -iu postgres make schema data
 cat <<EOF
 
 Gittip installed! To run,
-$ vagrant ssh
-$ sudo -iu postgres make run
+$ vagrant ssH -c "sudo -iu postgres make run"
 EOF
