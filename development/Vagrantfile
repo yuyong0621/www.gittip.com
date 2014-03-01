@@ -27,11 +27,18 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   config.vm.provision :chef_solo do |chef|
     chef.cookbooks_path = "cookbooks"
+    chef.add_recipe "apt"
     chef.add_recipe "python"
+    chef.add_recipe "postgresql::apt_pgdg_postgresql"
     chef.add_recipe "postgresql::server"
 
     chef.json = {
       :postgresql => {
+        :version => "9.2",
+        :config => {
+          :ssl_cert_file => "/etc/ssl/certs/ssl-cert-snakeoil.pem",
+          :ssl_key_file => "/etc/ssl/private/ssl-cert-snakeoil.key",
+        },
         :password => {
           :postgres => "sekret",
         },
