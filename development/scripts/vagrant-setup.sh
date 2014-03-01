@@ -7,21 +7,6 @@ echo "cd /vagrant" > /etc/profile.d/login-directory.sh
 
 # TODO: Pin apt-get packages to the same versions Heroku uses
 
-# Install dependencies
-echo "Updating apt repositories..."
-apt-get update -qq
-
-echo "Ensuring dependencies installed..."
-apt-get --yes -qq install \
-    make \
-    git \
-    build-essential \
-    python-software-properties \
-    postgresql-9.1 \
-    postgresql-contrib-9.1 \
-    libpq-dev \
-    python-dev
-
 # First run only
 if [ ! -f /home/vagrant/created_db ]; then
     echo "Configuring PostgreSQL..."
