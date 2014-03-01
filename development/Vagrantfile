@@ -4,8 +4,6 @@
 # Vagrantfile API/syntax version. Don't touch unless you know what you're doing!
 VAGRANTFILE_API_VERSION = "2"
 
-PROJECT_DIRECTORY = 'www.gittip.com'
-
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.box = "precise64"
   config.vm.box_url = "http://files.vagrantup.com/precise64.box"
@@ -16,11 +14,10 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   end
 
   # Sync the project directory and expose the app
-  config.vm.synced_folder "../", "/home/vagrant/#{PROJECT_DIRECTORY}"
+  config.vm.synced_folder "../", "/vagrant"
   config.vm.network :forwarded_port, guest: 8537, host: 8537
 
   config.vm.provision :shell,
-      :path => "scripts/vagrant-setup.sh",
-      :args => PROJECT_DIRECTORY
+      :path => "scripts/vagrant-setup.sh"
 
 end
