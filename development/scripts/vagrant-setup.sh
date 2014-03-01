@@ -33,20 +33,12 @@ if grep --quiet --binary --binary-files=without-match $(printf '\r') README.md; 
 fi
 
 # Set up the environment, the database, and run Gittip
-make schema data
-
-# Add run script
-cat > run <<EOF
-#!/bin/sh
-sudo pkill aspen
-make run
-EOF
-chmod +x run
+sudo -iu postgres make schema data
 
 # Output helper text
 cat <<EOF
 
 Gittip installed! To run,
 $ vagrant ssh
-$ ./run
+$ sudo -iu postgres make run
 EOF
