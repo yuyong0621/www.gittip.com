@@ -5,11 +5,11 @@ Vagrant.
 
 ## Requirements
 
-While specific versions may not be required, they have been vetted as
-working.
+While not specifically required, the indicated versions have been vetted
+as working.
 
-  * Vagrant X.Y.Z
-  * Virtualbox X.Y.Z
+  * [Virtualbox 4.3.8](https://www.virtualbox.org/wiki/Downloads)
+  * [Vagrant 1.4.3](https://www.vagrantup.com/downloads.html)
 
 ## First-time setup
 
