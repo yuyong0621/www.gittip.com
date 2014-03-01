@@ -5,6 +5,8 @@
 VAGRANTFILE_API_VERSION = "2"
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+  config.vm.define "gittip"
+
   config.vm.box = "precise64"
   config.vm.box_url = "http://files.vagrantup.com/precise64.box"
 
@@ -18,6 +20,10 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # Sync the project directory and expose the app
   config.vm.synced_folder "../", "/vagrant"
   config.vm.network :forwarded_port, guest: 8537, host: 8537
+
+  config.vm.provider :virtualbox do |vb|
+    vb.name = "gittip"
+  end
 
   config.vm.provision :chef_solo do |chef|
     chef.cookbooks_path = "cookbooks"
