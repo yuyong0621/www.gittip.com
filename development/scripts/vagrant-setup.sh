@@ -2,6 +2,9 @@
 
 set -e
 
+# Set login directory to root vagrant share
+echo "cd /vagrant" > /etc/profile.d/login-directory.sh
+
 # TODO: Pin apt-get packages to the same versions Heroku uses
 
 # Install dependencies
