@@ -32,8 +32,10 @@ if grep --quiet --binary --binary-files=without-match $(printf '\r') README.md; 
     exit 1
 fi
 
+
 # Set up the environment, the database, and run Gittip
-sudo -iu postgres make schema data
+make env
+sudo -u postgres make schema data
 
 # Output helper text
 cat <<EOF
