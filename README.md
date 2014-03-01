@@ -1,5 +1,8 @@
 # Welcome to Gittip [<img height="26px" src="www/assets/gittip.opengraph.png"/>](https://www.gittip.com/)
 
+[![Build Status](https://travis-ci.org/gittip/www.gittip.com.png?branch=master)](https://travis-ci.org/gittip/www.gittip.com)
+[![HuBoard badge](http://img.shields.io/badge/Hu-Board-7965cc.svg)](https://huboard.com/gittip/www.gittip.com)
+
 Gittip is a weekly gift exchange, helping to create a culture of generosity.
 If you'd like to learn more, check out <https://gittip.com/about>.
 If you'd like to contribute to Gittip, the best first reference is <https://gittip.com/for/contributors>.
@@ -506,3 +509,4 @@ and [crowdsourcing.org's](http://www.crowdsourcing.org/directory)*
  - [MedStartr](http://www.medstartr.com/) - Fund the medical breakthroughs and innovations you care about
  - [Upstart](https://www.upstart.com/) - Raise money from your future self
  - [Gitcoin](http://www.gitcoin.co/) - Give bitcoin donations to your favorite projects.
+ - [Patronism](http://patronism.com/) - Become a patron of your favorite band.

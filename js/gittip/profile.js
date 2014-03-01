@@ -51,7 +51,7 @@ Gittip.profile.init = function() {
         }
         function error(e) {
             $('#save-username').text('Save');
-            alert(JSON.parse(e.responseText).error);
+            alert(JSON.parse(e.responseText).error_message_long);
         }
         jQuery.ajax(
             { url: "username.json"
@@ -334,4 +334,26 @@ Gittip.profile.init = function() {
 
             return false;
         });
+    $('.account-delete').on('click', function () {
+        var $this = $(this);
+
+        jQuery.ajax({
+            url: "delete-elsewhere.json",
+            type: "POST",
+            dataType: "json",
+            success: function ( ) {
+                location.reload();
+            },
+            error: function (e) {
+                try {
+                    alert(JSON.parse(e.responseText).error_message_long);
+                } catch(exception) {
+                    alert("Some error occured: "+exception)
+                }
+            },
+            data: { platform: this.dataset.platform, user_id: this.dataset.user_id }
+        });
+
+        return false;
+    });
 };
