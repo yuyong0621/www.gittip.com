@@ -22,12 +22,16 @@ apt-get --yes -qq install \
     libpq-dev \
     python-dev
 
-# Configure Postgres
-sudo -i -u postgres sh <<EOF
-    psql \
-        --quiet \
-        --file=/home/vagrant/${PROJECT_DIRECTORY}/create_db.sql
+# First run only
+if [ ! -f /home/vagrant/created_db ]; then
+    echo "Configuring PostgreSQL..."
+    sudo -iu postgres bash <<EOF
+        psql \
+            --quiet \
+            --file=/vagrant/${PROJECT_DIRECTORY}/create_db.sql
 EOF
+    touch /home/vagrant/created_db
+fi
 
 cd /vagrant
 
