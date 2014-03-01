@@ -31,6 +31,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     chef.add_recipe "python"
     chef.add_recipe "postgresql::apt_pgdg_postgresql"
     chef.add_recipe "postgresql::server"
+    chef.add_recipe "postgresql::contrib"
 
     chef.json = {
       :postgresql => {
@@ -41,6 +42,11 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         },
         :password => {
           :postgres => "sekret",
+        },
+        :contrib => {
+          :extensions => [
+            "hstore",
+          ],
         },
       },
     }
