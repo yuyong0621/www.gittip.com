@@ -21,6 +21,16 @@ vagrant plugin install vagrant-omnibus
 vagrant plugin install vagrant-librarian-chef
 ```
 
+## Usage
+
+```
+cd development
+vagrant up
+vagrant ssH -c "sudo -iu postgres make run"
+```
+
+You now have the site running at `http://localhost:8537`. Huzzah!
+
 ## Recommended plugins
 
 While not strictly necessary, they will make working with Vagrant a bit
