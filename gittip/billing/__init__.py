@@ -77,15 +77,13 @@ def associate(db, thing, username, balanced_customer_href, balanced_thing_uri):
         if thing == "credit card":
             SQL %= "bill"
             obj = balanced.Card.fetch(balanced_thing_uri)
-
-        elif thing == "bank account":
-            SQL %= "ach"
-            obj = balanced.BankAccount.fetch(balanced_thing_uri)
+            #add = balanced_account.add_card
 
         else:
-            assert thing == "coinbase", thing  # sanity check
-            SQL %= "coinbase"
-            obj = balanced.ExternalAccount.fetch(balanced_thing_uri)
+            assert thing == "bank account", thing # sanity check
+            SQL %= "ach"
+            obj = balanced.BankAccount.fetch(balanced_thing_uri)
+            #add = balanced_account.add_bank_account
 
         obj.associate_to_customer(balanced_account)
     except balanced.exc.HTTPError as err:
@@ -107,15 +105,11 @@ def invalidate_on_balanced(thing, balanced_customer_href):
     See: https://github.com/balanced/balanced-api/issues/22
 
     """
-    assert thing in ("credit card", "bank account", "coinbase")
+    assert thing in ("credit card", "bank account")
     typecheck(balanced_customer_href, (str, unicode))
 
     customer = balanced.Customer.fetch(balanced_customer_href)
-    things = {
-        "credit card": customer.cards,
-        "bank account": customer.bank_accounts,
-        "coinbase": customer.external_accounts
-    }[thing]
+    things = customer.cards if thing == "credit card" else customer.bank_accounts
 
     for _thing in things:
         _thing.unstore()
@@ -126,25 +120,19 @@ def clear(db, thing, username, balanced_customer_href):
              , username, unicode
              , balanced_customer_href, (unicode, str)
               )
-    assert thing in ("credit card", "bank account", "coinbase"), thing
+    assert thing in ("credit card", "bank account"), thing
     invalidate_on_balanced(thing, balanced_customer_href)
-    sql = {
-        "credit card": "bill",
-        "bank account": "ach",
-        "coinbase": "coinbase"
-    }[thing]
     CLEAR = """\
 
         UPDATE participants
            SET last_%s_result=NULL
          WHERE username=%%s
 
-    """ % sql
+    """ % ("bill" if thing == "credit card" else "ach")
     db.run(CLEAR, (username,))
 
 
 def store_error(db, thing, username, msg):
-    # TODO: make this store coinbase errors
     typecheck(thing, unicode, username, unicode, msg, unicode)
     assert thing in ("credit card", "bank account"), thing
     ERROR = """\
@@ -207,26 +195,36 @@ class BalancedThing(object):
     """Represent either a credit card or a bank account.
     """
 
-    thing_type = None
+    thing_type = None           # either 'card' or 'bank_account'
+    keys_to_attr_paths = None   # set to a mapping in subclasses
 
     _customer = None    # underlying balanced.Customer object
     _thing = None       # underlying balanced.{BankAccount,Card} object
 
-    def _get(self, name, default=""):
+    def __getitem__(self, key):
         """Given a name, return a unicode.
+
+        Allow subclasses to provide a flat set of keys, which, under the hood,
+        might be nested attributes and/or keys. The traversal path is relative
+        to _thing (not self!).
+
         """
+        attr_path = self.keys_to_attr_paths.get(key, key)
+
         out = None
         if self._customer is not None and self._thing is not None:
             out = self._thing
-            for val in name.split('.'):
+            for val in attr_path.split('.'):
                 if type(out) is dict:
+                    # this lets us reach into the meta dict
                     out = out.get(val)
                 else:
-                    out = getattr(out, val)
+                    try:
+                        out = getattr(out, val)
+                    except AttributeError:
+                        raise KeyError("{} not found".format(val))
                 if out is None:
                     break
-        if out is None:
-            out = default
         return out
 
     def __init__(self, balanced_customer_href):
@@ -259,64 +257,32 @@ class BalancedThing(object):
 
 
 class BalancedCard(BalancedThing):
-    """This is a dict-like wrapper around a Balanced Account.
+    """This is a dict-like wrapper around a Balanced credit card.
     """
 
     thing_type = 'card'
 
-    def __getitem__(self, name):
-        """Given a name, return a string.
-        """
-
-        if name == 'id':
-            out = self._customer.href if self._customer is not None else None
-        else:
-            name = {
-                'address_1': 'address.line1',
-                'address_2': 'meta.address_2',
-                'country': 'meta.country',
-                'city_town': 'meta.city_town',
-                'zip': 'address.postal_code',
-                # gittip is saving the state in the meta field
-                # for compatibility with legacy customers
-                'state': 'meta.region',
-                'last4': 'number',
-                'last_four': 'number',
-            }.get(name, name)
-            out = self._get(name)
-
-        return out
+    keys_to_attr_paths = {
+        'id': 'customer.href',
+        'address_1': 'address.line1',
+        'address_2': 'meta.address_2',
+        'country': 'meta.country',
+        'city_town': 'meta.city_town',
+        'zip': 'address.postal_code',
+        # gittip is saving the state in the meta field
+        # for compatibility with legacy customers
+        'state': 'meta.region',
+        'last4': 'number',
+        'last_four': 'number',
+    }
 
 
 class BalancedBankAccount(BalancedThing):
-    """This is a dict-like wrapper around a Balanced Account.
+    """This is a dict-like wrapper around a Balanced bank account.
     """
 
     thing_type = 'bank_account'
 
-    def __getitem__(self, item):
-        mapper = {
-            'id': 'href',
-            'customer_href': 'customer.href',
-            'bank_name': 'bank_name',
-            'last_four': 'last_four',
-        }
-        if item not in mapper:
-            raise IndexError()
-        if not self._thing:
-            return None
-
-        return self._get(mapper[item])
-
-
-class BalancedExternalAccount(BalancedThing):
-
-    thing_type = 'external_account'
-
-    def __getitem__(self, item):
-        item = {
-            'id': 'href',
-            'customer_href': 'customer.href',
-        }.get(item, item)
-
-        return self._get(item)
+    keys_to_attr_paths = {
+        'customer_href': 'customer.href',
+    }

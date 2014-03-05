@@ -3,7 +3,7 @@ import time
 
 import re
 from aspen import log_dammit, Response
-from aspen.utils import typecheck
+from aspen.utils import typecheck, to_age
 from postgres.cursors import SimpleCursorBase
 from jinja2 import escape
 
@@ -272,10 +272,24 @@ def wrap(u):
 def linkify(u):
     escaped = unicode(escape(u))
 
-    urls = re.compile(r"((?:https?://|www\.)[\w\d.-]*\w(?:/(?:\S*\(\S*[^\s.,;:'\"]|\S*[^\s.,;:'\"()])*)?)", re.MULTILINE|re.UNICODE|re.IGNORECASE)
-    value = urls.sub(r'<a href="\1" target="_blank">\1</a>', escaped)
+    urls = re.compile(r"""
+        (                         # capture the entire URL
+            (?:(https?://)|www\.) # capture the protocol or match www.
+            [\w\d.-]*\w           # the domain
+            (?:/                  # the path
+                (?:\S*\(
+                    \S*[^\s.,;:'\"]|
+                    \S*[^\s.,;:'\"()]
+                )*
+            )?
+        )
+    """, re.VERBOSE|re.MULTILINE|re.UNICODE|re.IGNORECASE)
 
-    return value
+    return urls.sub(lambda m:
+        '<a href="%s" target="_blank">%s</a>' % (
+            m.group(1) if m.group(2) else 'http://'+m.group(1), m.group(1)
+        )
+    , escaped)
 
 def dict_to_querystring(mapping):
     if not mapping:
@@ -437,3 +451,20 @@ def get_avatar_url(obj):
     if not obj.avatar_url:
         return '/assets/-/avatar-default.gif'
     return obj.avatar_url
+
+def _to_age(participant):
+    # XXX I can't believe I'm doing this. Evolve aspen.utils.to_age!
+    age = to_age(participant.claimed_time, fmt_past="%(age)s")
+    age = age.replace('just a moment', 'just now')
+    age = age.replace('an ', '1 ').replace('a ', '1 ')
+    if age.endswith(' seconds'):
+        age = '1 minute'
+    words = ('zero', 'one', 'two','three', 'four', 'five', 'six', 'seven',
+                                                               'eight', 'nine')
+    for i, word in enumerate(words):
+        age = age.replace(word, str(i))
+    return age.replace(' ', ' <span class="unit">') + "</span>"
+
+def format_money(money):
+    format = '%.2f' if money < 1000 else '%.0f'
+    return format % money
