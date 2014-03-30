@@ -13,24 +13,7 @@ first_time = qs.get('first_time') == '1'
 [-----------------------------------------------------------------------------]
 {% extends "templates/profile.html" %}
 {% block page %}
-<style>
-    #matrix td {
-        text-align: left;
-        height: 30px;
-    }
-    #matrix h2,
-    #matrix tr.tip td,
-    #matrix tr.tip th,
-    #matrix tr.pledge td,
-    #matrix tr.pledge th {
-        white-space: nowrap;
-    }
-    #matrix th {
-        vertical-align: middle;
-        padding-right: 0.5em;
-    }
-</style>
-<table id="matrix" class="col0">
+<table id="giving" class="col0">
     <tr>
         <td colspan="2">
             {% if first_time %}
