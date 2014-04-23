@@ -1025,6 +1025,7 @@ class Participant(Model, MixinTeam):
                   FROM elsewhere
                  WHERE participant=%s
                    AND platform IN %s
+                   AND NOT is_team
             """, (self.username, AccountElsewhere.signin_platforms_names))
             assert len(accounts) > 0
             if len(accounts) == 1 and accounts[0] == (platform, user_id):
