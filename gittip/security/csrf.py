@@ -155,6 +155,3 @@ def outbound(request, response):
         cookie = response.headers.cookie['csrf_token']
         cookie['path'] = '/'
         cookie['expires'] = rfc822.formatdate(time.time() + TIMEOUT)
-
-        # Content varies with the CSRF cookie, so set the Vary header.
-        patch_vary_headers(response, ('Cookie',))
